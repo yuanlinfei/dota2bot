@@ -12,8 +12,9 @@ public:
     DataBase &operator=(const DataBase &) = delete;
     static DataBase &get_instance();
     ~DataBase();
-    void insert_account(int64_t qq_id, const std::string &nickname, int64_t short_steam_id);
+    void insert_account(const Account &account);
     void update_account(int64_t short_steam_id, int64_t last_match_id);
+    void remove_account(int64_t short_steam_id);
     std::vector<Account> get_accounts();
 
 private:

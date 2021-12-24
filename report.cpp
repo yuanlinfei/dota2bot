@@ -58,7 +58,7 @@ void report()
             {
                 account.last_match_id = last_match_id;
                 db.update_account(account.short_steam_id, last_match_id);
-                send_to_group(generate_report(account), account.qq_id);
+                send_to_group(generate_report(account), account.group_id, account.qq_id);
             }
             std::this_thread::sleep_for(std::chrono::seconds(5));
         }
