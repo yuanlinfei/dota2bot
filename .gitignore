@@ -1,0 +1,3 @@
+*.o
+.vscode/
+dota2.db
