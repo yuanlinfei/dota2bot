@@ -7,5 +7,6 @@
 
 int64_t get_last_match_id(int64_t short_steam_id);
 Match get_match_detail(int64_t match_id);
-std::string generate_report(int64_t match_id, int64_t short_steam_id);
+std::string generate_report(Account &account);
+void report();
 #endif

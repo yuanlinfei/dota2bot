@@ -51,7 +51,7 @@ void DataBase::update_account(int64_t short_steam_id, int64_t last_match_id)
 {
     int rc;
     char *error_msg;
-    std::string sql = fmt::format("update playerInfo set last_match_id = {} where short_steam_id = {}",
+    std::string sql = fmt::format("update playerInfo set last_match_id = {} where short_steam_id = {};commit",
                                   last_match_id, short_steam_id);
     std::lock_guard<std::mutex> lock(mtx_);
     rc = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &error_msg);
@@ -81,6 +81,6 @@ std::vector<Account> DataBase::get_accounts()
 int DataBase::callback(void *arg, int argc, char **fields, char **colnames)
 {
     std::vector<Account> *vector = static_cast<std::vector<Account> *>(arg);
-    vector->emplace_back(atol(fields[0]), fields[0], atol(fields[2]), fields[3] ? atol(fields[3]) : 0);
+    vector->emplace_back(atol(fields[0]), fields[1], atol(fields[2]), fields[3] ? atol(fields[3]) : 0);
     return 0;
 }
