@@ -36,14 +36,17 @@ Match get_match_detail(int64_t match_id)
 
 std::string generate_report(Account &account)
 {
-    Match &&match = get_match_detail(account.last_match_id);
+    Match match = get_match_detail(account.last_match_id);
     auto it = std::find_if(match.players.begin(), match.players.end(),
                            [=](const Player &player)
                            { return player.short_steam_id == account.short_steam_id; });
     assert(it != match.players.end());
     Player &player = *it;
-    return fmt::format("{:%Y-%m-%d %H:%M:%S}，{}使用了{}，KDA: {}[{}/{}/{}]，GPM/XPM: {}/{}，正补/反补: {}/{}, 输出{}。", *std::localtime(&match.start_time), account.nickname, player.hero, player.kda, player.kill,
-                       player.death, player.assistance, player.gpm, player.xpm, player.last_hits, player.dennies, player.hero_damage);
+    int total_hero_damage = 0;
+    std::for_each(match.players.begin(), match.players.end(), [&](const Player &player)
+                  { total_hero_damage += player.hero_damage; });
+    return fmt::format("{:%Y-%m-%d %H:%M:%S}，{}使用了{}，KDA: {}[{}/{}/{}]，GPM/XPM: {}/{}，正补/反补: {}/{}, 输出{}({}%)。", *std::localtime(&match.start_time), account.nickname, player.hero, player.kda, player.kill,
+                       player.death, player.assistance, player.gpm, player.xpm, player.last_hits, player.dennies, player.hero_damage, 100.0f * player.hero_damage / total_hero_damage);
 }
 
 void report()
