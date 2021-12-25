@@ -2,25 +2,21 @@
 #include "report.h"
 #include "curl/curl.h"
 #include "http.h"
-#include <fmt/core.h>
 #include "sender.h"
+#include <spdlog/sinks/basic_file_sink.h>
 #include <signal.h>
 #include <regex>
 #include <thread>
 #include <sio_client.h>
 #include <unistd.h>
-#include <iostream>
 #include <mutex>
 #include <condition_variable>
 
-
-#define HIGHLIGHT(STR) std::cout<<"\e[1;31m"<< STR <<"\e[0m"<<std::endl
-
 std::mutex mutex;
-
 std::condition_variable cond;
 bool connect_finish = false;
 sio::socket::ptr current_socket;
+auto logger = spdlog::basic_logger_mt("dota2_bot_logger", "logs/log.txt");
 
 void on_connected()
 {
@@ -31,13 +27,13 @@ void on_connected()
 
 void on_fail()
 {
-    std::cout<<"sio failed "<<std::endl;
+    logger->error("sio failed");
     exit(0);
 }
 
 void on_close(sio::client::close_reason const& reason)
 {
-    std::cout<<"sio closed "<<std::endl;
+    logger->info("sio closed");
     exit(0);
 }
 
@@ -47,6 +43,9 @@ int main(int argc ,const char* args[])
     signal(SIGTERM,SIG_IGN);
     signal(SIGINT,SIG_IGN);
     daemon(1, 0);
+
+    logger->set_level(spdlog::level::trace);
+    logger->flush_on(spdlog::level::trace);
 
     sio::client h;
     h.set_open_listener(&on_connected);
@@ -65,6 +64,7 @@ int main(int argc ,const char* args[])
         std::string content = data->get_map()["CurrentPacket"]->get_map()["Data"]->get_map()["Content"]->get_string();
         if (qq_id != 3192047076 && content[0] == '&') 
         {
+            logger->info("收到 {}", content);
             DataBase &db = DataBase::get_instance();
             if (content == "&查看监视") {
                 std::string message;
@@ -74,14 +74,21 @@ int main(int argc ,const char* args[])
                     if (account.group_id == group_id) 
                         message += fmt::format("[{}]  {}， {}， {}\n", ++num, account.short_steam_id, account.qq_id, account.nickname);
                 }
-                if (message.size() == 0)
+                if (message.size() == 0) 
+                {
                     send_to_group("没有人被监视", group_id);
+                    logger->info("没有人被监视 to {}", group_id);
+                }
                 else
+                {
                     send_to_group(message, group_id);
+                    logger->info("发送 {} to {}", message, group_id);
+                }
             }
             else if (content == "&帮助") 
             {
                 send_to_group("支持以下命令\n&查看监视\n&添加监视 steam账号 QQ号 昵称\n&移除监视 steam账号", group_id);
+                logger->info("发送 {} to {}", "支持以下命令\n&查看监视\n&添加监视 steam账号 QQ号 昵称\n&移除监视 steam账号", group_id);
             }
             else 
             {
@@ -93,11 +100,14 @@ int main(int argc ,const char* args[])
                     if (!std::regex_match(args[1], digits) || !std::regex_match(args[2], digits))
                     {
                         send_to_group("参数错误", group_id);
+                        logger->info("发送  {} to {}", "参数错误", group_id);
+
                     }
                     else
                     {
                         db.insert_account(Account(atol(args[1].c_str()), atol(args[2].c_str()), args[3], group_id, 0));
                         send_to_group("添加成功", group_id);
+                        logger->info("发送 {} to {}", "添加成功", group_id);
                     }
                 }
                 else if (args.size() == 2 && args[0] == "&移除监视")
@@ -106,14 +116,15 @@ int main(int argc ,const char* args[])
                     if (!std::regex_match(args[1], digits))
                     {
                         send_to_group("参数错误", group_id);
+                        logger->info("发送 {} to {}", "参数错误", group_id);
                     }
                     else 
                     {
                         db.remove_account(atol(args[1].c_str()));
                         send_to_group("移除成功", group_id);
+                        logger->info("{} to {}", "移除成功", group_id);
                     }
                 }
-
             }
         }
     }));

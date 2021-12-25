@@ -1,15 +1,15 @@
 CXX=g++
-CPPFLAGS=-std=c++17 -Wall
+CPPFLAGS=-std=c++17 -Wall -g
 LIBS=-lcurl -lsqlite3 -lfmt -lsioclient -lpthread
 
-all: Account.o Match.o Player.o db.o http.o report.o sender.o main.o 
-	$(CXX) $(CPPFLAGS) $^ -o $@ $(LIBS)
+bot: Account.o Match.o Player.o db.o http.o report.o sender.o main.o 
+	$(CXX) $(CPPFLAGS) $^ -o $@ $(LIBS) -g
 
 sender.o : sender.cpp
-	$(CXX) $(CPPFLAGS) -c $^ 
+	$(CXX) $(CPPFLAGS) -c $^
 
 main.o: main.cpp
-	$(CXX) $(CPPFLAGS) -c $^ 
+	$(CXX) $(CPPFLAGS) -c $^
 
 db.o: db.cpp
 	$(CXX) $(CPPFLAGS) -c $^

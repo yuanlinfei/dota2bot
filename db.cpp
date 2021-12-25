@@ -1,7 +1,10 @@
 #include "db.h"
 #include <sqlite3.h>
+#include <spdlog/sinks/basic_file_sink.h>
 #include <fmt/core.h>
 #include <iostream>
+
+extern std::shared_ptr<spdlog::logger> logger;
 
 DataBase::DataBase()
 {
@@ -17,7 +20,7 @@ DataBase::DataBase()
     rc = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &error_msg);
     if (rc != SQLITE_OK)
     {
-        printf("sqlite error: %s\n", error_msg);
+        logger->error("sqlite error: {}", error_msg);
         sqlite3_free(error_msg);
     }
 }
@@ -40,10 +43,11 @@ void DataBase::insert_account(const Account &account)
     std::string sql = fmt::format("insert into playerInfo(short_steam_ID, qq_id, nickname, group_id) values({}, {}, '{}', {});",
                                   account.short_steam_id, account.qq_id, account.nickname, account.group_id);
     std::lock_guard<std::mutex> lock(mtx_);
+    logger->info("执行sql: {}", sql);
     rc = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &error_msg);
     if (rc != SQLITE_OK)
     {
-        printf("sqlite error: %s\n", error_msg);
+        logger->error("sqlite error: {}", error_msg);
         sqlite3_free(error_msg);
     }
 }
@@ -55,10 +59,11 @@ void DataBase::update_account(int64_t short_steam_id, int64_t last_match_id)
     std::string sql = fmt::format("update playerInfo set last_match_id = {} where short_steam_id = {}",
                                   last_match_id, short_steam_id);
     std::lock_guard<std::mutex> lock(mtx_);
+    logger->info("执行sql: {}", sql);
     rc = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &error_msg);
     if (rc != SQLITE_OK)
     {
-        printf("sqlite error: %s\n", error_msg);
+        logger->error("sqlite error: {}", error_msg);
         sqlite3_free(error_msg);
     }
 }
@@ -69,10 +74,11 @@ void DataBase::remove_account(int64_t short_steam_id)
     char *error_msg;
     std::string sql = fmt::format("delete from  playerInfo where short_steam_id = {}", short_steam_id);
     std::lock_guard<std::mutex> lock(mtx_);
+    logger->info("执行sql: {}", sql);
     rc = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &error_msg);
     if (rc != SQLITE_OK)
     {
-        printf("sqlite error: %s\n", error_msg);
+        logger->error("sqlite error: {}", error_msg);
         sqlite3_free(error_msg);
     }
 }
@@ -82,12 +88,13 @@ std::vector<Account> DataBase::get_accounts()
     int rc;
     char *error_msg;
     std::vector<Account> accounts;
-    std::lock_guard<std::mutex> lock(mtx_);
     std::string sql = "select * from playerInfo";
+    std::lock_guard<std::mutex> lock(mtx_);
+    logger->info("执行sql: {}", sql);
     rc = sqlite3_exec(db_, sql.c_str(), callback, (void *)&accounts, &error_msg);
     if (rc != SQLITE_OK)
     {
-        printf("sqlite error: %s\n", error_msg);
+        logger->error("sqlite error: {}", error_msg);
         sqlite3_free(error_msg);
     }
     return accounts;
