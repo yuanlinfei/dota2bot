@@ -2,15 +2,18 @@
 #include "Match.h"
 #include "db.h"
 #include "sender.h"
+#include <fmt/chrono.h>
+#include <spdlog/sinks/basic_file_sink.h>
 #include <nlohmann/json.hpp>
-#include <fmt/core.h>
-#include "fmt/chrono.h"
+#include <exception>
 #include <thread>
 #include <string>
 #include <vector>
 
 #define to_long_steam_id(id) (id + 76561197960265728)
 #define to_short_steam_id(id) (id - 76561197960265728)
+
+extern std::shared_ptr<spdlog::logger> logger;
 
 int64_t get_last_match_id(int64_t short_steam_id)
 {
@@ -43,9 +46,12 @@ std::string generate_report(Account &account)
     assert(it != match.players.end());
     Player &player = *it;
     int total_hero_damage = 0;
-    std::for_each(match.players.begin(), match.players.end(), [&](const Player &player)
-                  { total_hero_damage += player.hero_damage; });
-    return fmt::format("{:%Y-%m-%d %H:%M:%S}，{}使用了{}，KDA: {}[{}/{}/{}]，GPM/XPM: {}/{}，正补/反补: {}/{}, 输出{}({}%)。", *std::localtime(&match.start_time), account.nickname, player.hero, player.kda, player.kill,
+    std::for_each(match.players.begin(), match.players.end(), [&](const Player &p)
+                  {
+                      if (p.radiant == player.radiant)
+                          total_hero_damage += p.hero_damage;
+                  });
+    return fmt::format("{:%Y-%m-%d %H:%M:%S}，{}使用{}{}了比赛，KDA: {}[{}/{}/{}]，GPM/XPM: {}/{}，正补/反补: {}/{}, 输出{}({}%)。", *std::localtime(&match.start_time), account.nickname, player.hero, match.radiant_win == player.radiant ? "赢得" : "输掉", player.kda, player.kill,
                        player.death, player.assistance, player.gpm, player.xpm, player.last_hits, player.dennies, player.hero_damage, 100.0f * player.hero_damage / total_hero_damage);
 }
 
@@ -54,17 +60,32 @@ void report()
     DataBase &db = DataBase::get_instance();
     for (;;)
     {
-        for (Account &account : db.get_accounts())
+        try
         {
-            if (int64_t last_match_id = get_last_match_id(account.short_steam_id);
-                last_match_id != account.last_match_id)
+            for (Account &account : db.get_accounts())
             {
-                account.last_match_id = last_match_id;
-                db.update_account(account.short_steam_id, last_match_id);
-                send_to_group(generate_report(account), account.group_id, account.qq_id);
+                if (int64_t last_match_id = get_last_match_id(account.short_steam_id);
+                    last_match_id != account.last_match_id)
+                {
+                    account.last_match_id = last_match_id;
+                    db.update_account(account.short_steam_id, last_match_id);
+                    try
+                    {
+                        send_to_group(generate_report(account), account.group_id, account.qq_id);
+                        logger->info("发送 战报 to {}", account.group_id);
+                    }
+                    catch (std::exception &e)
+                    {
+                        logger->error("发送战绩失败 {}", e.what());
+                    }
+                }
+                std::this_thread::sleep_for(std::chrono::seconds(5));
             }
-            std::this_thread::sleep_for(std::chrono::seconds(5));
+            std::this_thread::sleep_for(std::chrono::seconds(300));
         }
-        std::this_thread::sleep_for(std::chrono::seconds(300));
+        catch (std::exception &e)
+        {
+            logger->error("运行时异常 {}", e.what());
+        }
     }
 }
