@@ -2,8 +2,11 @@ CXX=g++
 CPPFLAGS=-std=c++17 -Wall -g
 LIBS=-lcurl -lsqlite3 -lfmt -lsioclient -lpthread
 
-bot: Account.o Match.o Player.o db.o http.o report.o sender.o handle.o main.o 
+bot: Account.o Match.o Player.o db.o http.o report.o sender.o handle.o dota.o main.o 
 	$(CXX) $(CPPFLAGS) $^ -o $@ $(LIBS)
+
+dota.o : dota.cpp
+	$(CXX) $(CPPFLAGS) -c $^
 
 handle.o : handle.cpp
 	$(CXX) $(CPPFLAGS) -c $^

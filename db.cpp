@@ -90,7 +90,7 @@ std::vector<Account> DataBase::get_accounts()
     std::vector<Account> accounts;
     std::string sql = "select * from playerInfo";
     std::lock_guard<std::mutex> lock(mtx_);
-    logger->info("执行sql: {}", sql);
+    // logger->info("执行sql: {}", sql);
     rc = sqlite3_exec(db_, sql.c_str(), callback, (void *)&accounts, &error_msg);
     if (rc != SQLITE_OK)
     {

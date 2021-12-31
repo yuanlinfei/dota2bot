@@ -9,9 +9,11 @@ struct Match
 {
     int64_t match_id;
     int64_t start_time;
-    int64_t duration;
+    int minutes;
+    int seconds;
     int socres[2];
     bool radiant_win;
+    std::string game_mode;
     std::vector<Player> players;
 };
 void from_json(const nlohmann::json& json, Match& match);
