@@ -16,7 +16,7 @@ void from_json(const nlohmann::json &json, Player &player)
     json.at("xp_per_min").get_to(player.xpm);
     json.at("last_hits").get_to(player.last_hits);
     json.at("denies").get_to(player.dennies);
-    json.at("scaled_hero_damage").get_to(player.hero_damage);
-    json.at("scaled_tower_damage").get_to(player.tower_damage);
-    json.at("scaled_hero_healing").get_to(player.hero_healing);
+    json.at("hero_damage").get_to(player.hero_damage);
+    json.at("tower_damage").get_to(player.tower_damage);
+    json.at("hero_healing").get_to(player.hero_healing);
 }
