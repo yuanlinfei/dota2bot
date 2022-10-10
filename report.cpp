@@ -18,7 +18,7 @@ extern std::shared_ptr<spdlog::logger> logger;
 bool open_dota_match_history(int64_t short_steam_id) 
 {
     std::string url = fmt::format("https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/"
-                                  "v1?key=0A93BB155FCA1A281587AE2567CE9EFE&account_id={}&matches_requested=1",
+                                  "v1?key=F5DC8EE8056D66D5F7CDAC073AA0E10B&account_id={}&matches_requested=1",
                                   short_steam_id);
     std::string response;
     http_get(url, response, 10);
@@ -32,7 +32,7 @@ int64_t get_last_match_id(int64_t short_steam_id)
     std::string response;
     nlohmann::json json;
     std::string url = fmt::format("https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/"
-                                  "v1?key=0A93BB155FCA1A281587AE2567CE9EFE&account_id={}&matches_requested=1",
+                                  "v1?key=F5DC8EE8056D66D5F7CDAC073AA0E10B&account_id={}&matches_requested=1",
                                   short_steam_id);
     http_get(url, response, 10);
     try
@@ -51,7 +51,7 @@ Match get_match_detail(int64_t match_id)
 {
     std::string response;
     std::string url = fmt::format("https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/"
-                                  "v1?key=0A93BB155FCA1A281587AE2567CE9EFE&match_id={}&include_persona_names=1",
+                                  "v1?key=F5DC8EE8056D66D5F7CDAC073AA0E10B&match_id={}&include_persona_names=1",
                                   match_id);
     http_get(url, response, 10);
     nlohmann::json json = nlohmann::json::parse(response);
