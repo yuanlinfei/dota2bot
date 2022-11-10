@@ -1,8 +1,8 @@
+#include <sio_client.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <regex>
 #include "sender.h"
 #include "db.h"
-#include <spdlog/sinks/basic_file_sink.h>
-#include <sio_client.h>
-#include <regex>
 
 extern std::shared_ptr<spdlog::logger> logger;
 

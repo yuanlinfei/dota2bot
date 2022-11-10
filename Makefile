@@ -1,6 +1,6 @@
 CXX=g++
 CPPFLAGS=-std=c++17 -Wall -g
-LIBS=-lcurl -lsqlite3 -lfmt -lsioclient -lpthread
+LIBS=-lcurl -lsqlite3 -lsioclient -lpthread
 
 bot: Account.o Match.o Player.o db.o http.o report.o sender.o handle.o dota.o main.o 
 	$(CXX) $(CPPFLAGS) $^ -o $@ $(LIBS)

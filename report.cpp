@@ -1,7 +1,3 @@
-#include "http.h"
-#include "Match.h"
-#include "db.h"
-#include "sender.h"
 #include <fmt/chrono.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <nlohmann/json.hpp>
@@ -9,6 +5,10 @@
 #include <thread>
 #include <string>
 #include <vector>
+#include "http.h"
+#include "Match.h"
+#include "db.h"
+#include "sender.h"
 
 #define to_long_steam_id(id) (id + 76561197960265728)
 #define to_short_steam_id(id) (id - 76561197960265728)
@@ -32,8 +32,9 @@ int64_t get_last_match_id(int64_t short_steam_id)
     std::string response;
     nlohmann::json json;
     std::string url = fmt::format("https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/"
-                                  "v1?key=F5DC8EE8056D66D5F7CDAC073AA0E10B&account_id={}&matches_requested=1",
+                                  "v1?key=C6198ACA29D2CFB952C8F2CB3463C42C&account_id={}&matches_requested=1",
                                   short_steam_id);
+
     http_get(url, response, 10);
     try
     {
@@ -51,7 +52,7 @@ Match get_match_detail(int64_t match_id)
 {
     std::string response;
     std::string url = fmt::format("https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/"
-                                  "v1?key=F5DC8EE8056D66D5F7CDAC073AA0E10B&match_id={}&include_persona_names=1",
+                                  "v1?key=C6198ACA29D2CFB952C8F2CB3463C42C&match_id={}&include_persona_names=1",
                                   match_id);
     http_get(url, response, 10);
     nlohmann::json json = nlohmann::json::parse(response);

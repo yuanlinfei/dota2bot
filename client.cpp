@@ -1,4 +1,3 @@
-#include "http.h"
 #include <sio_client.h>
 #include <string.h>
 #include <unistd.h>
@@ -7,6 +6,7 @@
 #include <string>
 #include <mutex>
 #include <condition_variable>
+#include "http.h"
 
 
 #define HIGHLIGHT(STR) std::cout<<"\e[1;31m"<< STR <<"\e[0m"<<std::endl

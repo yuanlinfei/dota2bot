@@ -1,6 +1,6 @@
+#include <nlohmann/json.hpp>
 #include "Player.h"
 #include "dota.h"
-#include <nlohmann/json.hpp>
 
 void from_json(const nlohmann::json &json, Player &player)
 {

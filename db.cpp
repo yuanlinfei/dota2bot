@@ -1,7 +1,6 @@
 #include "db.h"
 #include <sqlite3.h>
 #include <spdlog/sinks/basic_file_sink.h>
-#include <fmt/core.h>
 #include <iostream>
 
 extern std::shared_ptr<spdlog::logger> logger;
