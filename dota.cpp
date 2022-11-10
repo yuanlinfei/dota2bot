@@ -127,7 +127,7 @@ std::map<int, std::string> heros {
 };
 
 std::map<int, std::string> game_modes {
-    {0, "None"},
+    {0, "未知模式"},
     {1, "全英雄选择"},
     {2, "队长模式"},
     {3, "随机征召"},
@@ -139,14 +139,16 @@ std::map<int, std::string> game_modes {
     {9, "The Greeviling"},
     {10, "Tutorial"},
     {11, "Mid Only"},
-    {12, "Least Played"},
+    {12, "Limited Heroes"},
     {13, "New Player Pool"},
     {14, "Compendium Matchmaking"},
-    {15, "Co-op vs Bots"},
+    {15, "Custom"},
     {16, "Captains Draft"},
     {18, "技能征召"},
     {20, "全英雄死亡随机"},
     {21, "1v1中路对单"},
-    {22, "全英雄选择"},
+    {22, "All Draft"},
     {23, "加速模式"},
+    {24, "Mutation"},
+    {25, "Coaches Challenge"}
 };

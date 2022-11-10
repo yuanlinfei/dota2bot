@@ -73,9 +73,22 @@ std::string generate_report(Account &account)
                       if (p.radiant == player.radiant)
                           total_hero_damage += p.hero_damage;
                   });
-    return fmt::format("开始时间: {:%Y-%m-%d %H:%M:%S}\n持续时间: {}分{}秒\n游戏模式: {}\n[{}]使用[{}]{}\nKDA: {:.2f}[{}/{}/{}]\nGPM/XPM: {}/{}\n正补/反补: {}/{}\n输出: {}({:.2f}%)",
-                       *std::localtime(&match.start_time), match.minutes, match.seconds, match.game_mode,account.nickname, player.hero, match.radiant_win == player.radiant ? "WIN" : "LOSS",
-                       player.kda, player.kill, player.death, player.assistance, player.gpm, player.xpm, player.last_hits, player.dennies, player.hero_damage, total_hero_damage ? 100.0f * player.hero_damage / total_hero_damage: 0.0f);
+    return fmt::format("开始时间: {:%Y-%m-%d %H:%M:%S}\n"
+                       "持续时间: {}分{}秒\n游戏模式: {}\n"
+                       "[{}]使用[{}]{}\n"
+                       "KDA: {:.2f}[{}/{}/{}]\n"
+                       "参战率: {:.2f}\n"
+                       "GPM/XPM: {}/{}\n"
+                       "正补/反补: {}/{}\n"
+                       "输出: {}({:.2f}%)",
+                       *std::localtime(&match.start_time), 
+                       match.minutes, match.seconds, match.game_mode, 
+                       account.nickname, player.hero, match.radiant_win == player.radiant ? "WIN" : "LOSS",
+                       player.kda, player.kill, player.death, player.assistance, 
+                       (player.kill + player.death) / ((player.radiant ? match.socres[0] : match.socres[1]) ? (player.radiant ? match.socres[0] : match.socres[1]) : 1),
+                       player.gpm, player.xpm, 
+                       player.last_hits, player.dennies, 
+                       player.hero_damage, total_hero_damage ? 100.0f * player.hero_damage / total_hero_damage: 0.0f);
 }
 
 void report()
