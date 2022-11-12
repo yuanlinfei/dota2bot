@@ -77,7 +77,7 @@ std::string generate_report(Account &account)
                        "持续时间: {}分{}秒\n游戏模式: {}\n"
                        "[{}]使用[{}]{}\n"
                        "KDA: {:.2f}[{}/{}/{}]\n"
-                       "参战率: {:.2f}\n"
+                       "参战率: {:.2f}%\n"
                        "GPM/XPM: {}/{}\n"
                        "正补/反补: {}/{}\n"
                        "输出: {}({:.2f}%)",
@@ -85,7 +85,7 @@ std::string generate_report(Account &account)
                        match.minutes, match.seconds, match.game_mode, 
                        account.nickname, player.hero, match.radiant_win == player.radiant ? "WIN" : "LOSS",
                        player.kda, player.kill, player.death, player.assistance, 
-                       (player.kill + player.death) / (float)((player.radiant ? match.socres[0] : match.socres[1]) ? (player.radiant ? match.socres[0] : match.socres[1]) : 1),
+                       100 * (player.kill + player.assistance) / (float)((player.radiant ? match.socres[0] : match.socres[1]) ? (player.radiant ? match.socres[0] : match.socres[1]) : 1),
                        player.gpm, player.xpm, 
                        player.last_hits, player.dennies, 
                        player.hero_damage, total_hero_damage ? 100.0f * player.hero_damage / total_hero_damage: 0.0f);
